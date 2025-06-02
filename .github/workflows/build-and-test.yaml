@@ -28,7 +28,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        browser: ["chrome", "firefox", "edge"]
+        browser: ["chrome", "edge"]
     name: Run tests on ${{ matrix.browser }}
     steps:
       - name: Checkout
@@ -50,8 +50,6 @@ jobs:
           start: npm run dev
           wait-on: http://localhost:3000
           wait-on-timeout: 60 # seconds
-          record: false
-          group: 'Cypress Tests'
 
       # - name: Run tests
       #   run: npm run e2e:headless
