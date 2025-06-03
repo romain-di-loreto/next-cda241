@@ -79,16 +79,12 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - name: uses appleboy/ssh-action@v4
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd ./$(basename "${{ github.repository }}")
-            git reset --hard HEAD
-            git pull origin main
-            /home/ubuntu/.nvm/versions/node/v24.1.0/bin/npm install
-            /home/ubuntu/.nvm/versions/node/v24.1.0/bin/npm run build
-            /home/ubuntu/.nvm/versions/node/v24.1.0/bin/pm2 restart $(basename "${{ github.repository }}")
+      - name:  Pulling latest code
+      # Ensure the repository is checked out to the correct directory
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && git reset --hard HEAD && git pull origin main"
+      - name: Install dependencies on server
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && /home/ubuntu/.nvm/versions/node/v24.1.0/bin/npm install"
+      - name: Building application
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && /home/ubuntu/.nvm/versions/node/v24.1.0/bin/npm run build"
+      - name: Restarting application
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "/home/ubuntu/.nvm/versions/node/v24.1.0/bin/pm2 restart $(basename "${{ github.repository }}")"
