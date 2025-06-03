@@ -82,8 +82,8 @@ jobs:
       - name:  Pulling latest code
         run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && git reset --hard HEAD && git pull origin main"
       - name: Install dependencies on server
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && cd ./$(basename "${{ github.repository }}") && /home/ubuntu/.nvm/versions/node/v24.1.0/bin/npm install"
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && nvm use node && cd ./$(basename "${{ github.repository }}") && /home/${{ secrets.SSH_USER }}/.nvm/versions/node/v24.1.0/bin/npm install"
       - name: Building application
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && cd ./$(basename "${{ github.repository }}") && /home/ubuntu/.nvm/versions/node/v24.1.0/bin/npm run build"
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && nvm use node && cd ./$(basename "${{ github.repository }}") && /home/${{ secrets.SSH_USER }}/.nvm/versions/node/v24.1.0/bin/npm run build"
       - name: Restarting application
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && /home/ubuntu/.nvm/versions/node/v24.1.0/bin/pm2 restart $(basename "${{ github.repository }}")"
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && nvm use node && /home/${{ secrets.SSH_USER }}/.nvm/versions/node/v24.1.0/bin/pm2 restart $(basename "${{ github.repository }}")"
