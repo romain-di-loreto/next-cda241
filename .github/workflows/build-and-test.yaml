@@ -83,8 +83,8 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
       - name:  Pulling latest code
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename ${{ github.repository }}) && git pull origin main"
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && git pull origin main"
       - name: Install dependencies on server
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename ${{ github.repository }}) && npm install"
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && npm install"
       - name: Restarting application
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"npx pm2 restart $(basename ${{ github.repository }})"
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "npx pm2 restart $(basename "${{ github.repository }}")"
