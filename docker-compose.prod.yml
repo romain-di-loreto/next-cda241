@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   next-app:
-    image: ghcr.io/${REPO_NAME}/next-app:latest
+    image: ghcr.io/romain-di-loreto/next-cda241/next-app:latest
     container_name: next-app
     ports:
       - "80:3000"
