@@ -1,5 +1,5 @@
 name: Build Docker Image And Deploy to Remote Server
-run-name: ${{ github.actor }} building and testing the code 🚀
+run-name: ${{ github.actor }} building and deploy docker image 🚀
 on: 
   push:
     branches:
@@ -47,4 +47,4 @@ jobs:
       - name: Pulling latest code
         run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && git reset --hard HEAD && git pull origin main"
       - name: Deploy Docker Compose
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && export REPO_NAME=${{ github.repository }} && sudo docker compose -f docker-compose.prod.yml pull && sudo docker compose -f docker-compose.prod.yml up -d"
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && REPO_NAME=${{ github.repository }} sudo docker compose -f docker-compose.prod.yml pull && REPO_NAME=${{ github.repository }} sudo docker compose -f docker-compose.prod.yml up -d"
