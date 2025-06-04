@@ -1,89 +1,89 @@
-name: Build, Test and Deploy Next.js App
-run-name: ${{ github.actor }} building and testing the code 🚀
-on: 
-  push:
-    branches:
-      - main
-jobs:
-  # build:
-  #   runs-on: ubuntu-latest
-  #   name: Build Next.js App
-  #   steps:
-  #     - uses: actions/checkout@v4
+# name: Build, Test and Deploy Next.js App
+# run-name: ${{ github.actor }} building and testing the code 🚀
+# on: 
+#   push:
+#     branches:
+#       - main
+# jobs:
+#   # build:
+#   #   runs-on: ubuntu-latest
+#   #   name: Build Next.js App
+#   #   steps:
+#   #     - uses: actions/checkout@v4
 
-  #     - name: Cache node modules
-  #       id: cache-node-modules
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: |
-  #           node_modules
-  #           /home/runner/.cache/Cypress
-  #         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+#   #     - name: Cache node modules
+#   #       id: cache-node-modules
+#   #       uses: actions/cache@v4
+#   #       with:
+#   #         path: |
+#   #           node_modules
+#   #           /home/runner/.cache/Cypress
+#   #         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
 
-  #     - name: Install dependencies
-  #       run: npm install
+#   #     - name: Install dependencies
+#   #       run: npm install
 
-  #     - name: Build
-  #       run: npm run build
+#   #     - name: Build
+#   #       run: npm run build
     
-  # test:
+#   # test:
+#   #   runs-on: ubuntu-latest
+#   #   needs: build
+#   #   strategy:
+#   #     matrix:
+#   #       browser: ["chrome", "edge"]
+#   #   name: Run tests on ${{ matrix.browser }}
+#   #   steps:
+#   #     - name: Checkout
+#   #       uses: actions/checkout@v4
+
+#   #     - name: Restore cached Node Modules
+#   #       id: cache-node-modules-restore
+#   #       uses: actions/cache/restore@v4
+#   #       with:
+#   #         path: |
+#   #           node_modules
+#   #           /home/runner/.cache/Cypress
+#   #         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+#   #     - name: Run tests
+#   #       uses: cypress-io/github-action@v6
+#   #       with:
+#   #         install: false
+#   #         browser: ${{ matrix.browser }}
+#   #         start: npm run dev
+
+#   #     - name: Save Cypress videos
+#   #       if: always()
+#   #       uses: actions/upload-artifact@v4
+#   #       with:
+#   #         name: ${{ matrix.browser }}-cypress-videos
+#   #         path: cypress/videos
+#   #         if-no-files-found: ignore
+#   #     - name: Save Cypress screenshots
+#   #       if: always()
+#   #       uses: actions/upload-artifact@v4
+#   #       with:
+#   #         name: ${{ matrix.browser }}-cypress-screenshots
+#   #         path: cypress/screenshots
+#   #         if-no-files-found: ignore
+
+#     # needs: test
+  # deploy:
   #   runs-on: ubuntu-latest
-  #   needs: build
-  #   strategy:
-  #     matrix:
-  #       browser: ["chrome", "edge"]
-  #   name: Run tests on ${{ matrix.browser }}
+  #   name: Deploy to Production Server
   #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-
-  #     - name: Restore cached Node Modules
-  #       id: cache-node-modules-restore
-  #       uses: actions/cache/restore@v4
-  #       with:
-  #         path: |
-  #           node_modules
-  #           /home/runner/.cache/Cypress
-  #         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-
-  #     - name: Run tests
-  #       uses: cypress-io/github-action@v6
-  #       with:
-  #         install: false
-  #         browser: ${{ matrix.browser }}
-  #         start: npm run dev
-
-  #     - name: Save Cypress videos
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ matrix.browser }}-cypress-videos
-  #         path: cypress/videos
-  #         if-no-files-found: ignore
-  #     - name: Save Cypress screenshots
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ matrix.browser }}-cypress-screenshots
-  #         path: cypress/screenshots
-  #         if-no-files-found: ignore
-
-    # needs: test
-  deploy:
-    runs-on: ubuntu-latest
-    name: Deploy to Production Server
-    steps:
-      - name: Setting up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-      - name:  Pulling latest code
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && git reset --hard HEAD && git pull origin main"
-      - name: Install dependencies on server
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && nvm use node && cd ./$(basename "${{ github.repository }}") && /home/${{ secrets.SSH_USER }}/.nvm/versions/node/v24.1.0/bin/npm install"
-      - name: Building application
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && nvm use node && cd ./$(basename "${{ github.repository }}") && /home/${{ secrets.SSH_USER }}/.nvm/versions/node/v24.1.0/bin/npm run build"
-      - name: Restarting application
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && nvm use node && /home/${{ secrets.SSH_USER }}/.nvm/versions/node/v24.1.0/bin/pm2 restart $(basename "${{ github.repository }}")"
+  #     - name: Setting up SSH
+  #       run: |
+  #         mkdir -p ~/.ssh
+  #         echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+  #         chmod 600 ~/.ssh/id_rsa
+  #         ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+  #     - name:  Pulling latest code
+  #       run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && git reset --hard HEAD && git pull origin main"
+  #     - name: Install dependencies on server
+  #       run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && nvm use node && cd ./$(basename "${{ github.repository }}") && /home/${{ secrets.SSH_USER }}/.nvm/versions/node/v24.1.0/bin/npm install"
+  #     - name: Building application
+  #       run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && nvm use node && cd ./$(basename "${{ github.repository }}") && /home/${{ secrets.SSH_USER }}/.nvm/versions/node/v24.1.0/bin/npm run build"
+  #     - name: Restarting application
+  #       run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "source ~/.nvm/nvm.sh && nvm use node && /home/${{ secrets.SSH_USER }}/.nvm/versions/node/v24.1.0/bin/pm2 restart $(basename "${{ github.repository }}")"

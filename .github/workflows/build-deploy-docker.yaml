@@ -1,0 +1,50 @@
+name: Build Docker Image And Deploy to Remote Server
+run-name: ${{ github.actor }} building and testing the code 🚀
+on: 
+  push:
+    branches:
+      - main
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+    name: Build Docker Image
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker's apt repository.
+        run : |
+          sudo apt-get update
+          sudo apt-get install ca-certificates curl
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          sudo chmod a+r /etc/apt/keyrings/docker.asc
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+      - name: Install Docker Engine
+        run: |
+          sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+      - name: Docker Login ghcr.io
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Build Docker Image
+        run: docker build -t ghcr.io/${{ github.repository }}/next-app:latest ./
+      - name: Push Docker Image
+        run: docker push ghcr.io/${{ github.repository }}/next-app:latest
+      - name: Logout from ghcr.io
+        run: docker logout ghcr.io
+  deploy-docker:
+    runs-on: ubuntu-latest
+    needs: build-docker
+    name: Deploy Docker Image To Remote Server With SSH
+    steps:
+      - name: Setting up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+      - name:  Pulling latest code
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && git reset --hard HEAD && git pull origin main"
+      - name: Deploy Docker Compose
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ./$(basename "${{ github.repository }}") && sudo docker-compose -f docker-compose.prod.yml pull && sudo docker-compose -f docker-compose.prod.yml up -d"
