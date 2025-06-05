@@ -79,6 +79,7 @@ jobs:
     # needs: test
     environment:
       name: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+    if: github.ref_name == 'main' || github.ref_name == 'dev'
     env:
       IMAGE_NAME: ghcr.io/${{ github.repository }}/${{ vars.IMAGE_NAME }}:latest
     steps:
