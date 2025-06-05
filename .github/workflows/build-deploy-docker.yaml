@@ -112,6 +112,7 @@ jobs:
     needs: build-docker
     environment:
       name: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+      url: http://ec2-54-144-41-163.compute-1.amazonaws.com${{ github.ref_name == 'main' && '' || ':8080' }}
     name: Deploy ${{ github.ref_name == 'main' && 'Production' || 'Test' }} Docker Image To Remote Server With SSH
     env:
       WORKDIR: ./$(basename "${{ github.repository }}")/${{ vars.WORKDIR }}
