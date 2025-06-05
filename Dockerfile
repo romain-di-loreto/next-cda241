@@ -1,4 +1,4 @@
-FROM node:24-alpine3.22 as builder
+FROM node:24-alpine3.22 AS builder
 
 LABEL org.opencontainers.image.source=https://github.com/romain-di-loreto/next-cda241
 
@@ -9,7 +9,7 @@ WORKDIR /app
 RUN npm install 
 RUN npm run build
 
-FROM node:24-alpine3.22 as next
+FROM node:24-alpine3.22 AS next
 
 COPY --from=builder /app/.next /app/.next
 COPY --from=builder /app/node_modules /app/node_modules
