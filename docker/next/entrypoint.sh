@@ -1,5 +1,7 @@
 #!/bin/sh
 
-npm install
+if [ "$NODE_ENV" = "development" ]; then
+  npm install
+fi
 
 exec "$@"

@@ -1,16 +1,21 @@
-FROM debian:12
-RUN apt-get update -yq \
-    && apt-get install curl gnupg -yq \
-    && curl -sL https://deb.nodesource.com/setup_18.x | bash \
-    && apt-get install nodejs -yq \
-    && apt-get clean -y
+FROM node:24-alpine3.22 as builder
 
 LABEL org.opencontainers.image.source=https://github.com/romain-di-loreto/next-cda241
+
 COPY . /app/
+
 WORKDIR /app
 
 RUN npm install 
 RUN npm run build
+
+FROM node:24-alpine3.22 as next
+
+COPY --from=builder /app/.next /app/.next
+COPY --from=builder /app/node_modules /app/node_modules
+COPY --from=builder /app/package.json /app/package.json
+
+WORKDIR /app
 
 EXPOSE 3000
 

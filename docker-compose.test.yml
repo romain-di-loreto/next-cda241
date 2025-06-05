@@ -1,11 +1,20 @@
-version: '3.8'
+networks:
+  next-cda241:
+    name: next-cda241
+    driver: bridge
 
 services:
-  next-app:
+  next-app-test:
     image: ghcr.io/romain-di-loreto/next-cda241/next-app-test:latest
     container_name: next-app-test
     ports:
-      - "8080:3000"
+      - "3000:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.next-app-test.rule=Host(`54.144.41.163`)"
+      - "traefik.http.routers.next-app-test.entrypoints=web"
+    networks:
+      - next-cda241
