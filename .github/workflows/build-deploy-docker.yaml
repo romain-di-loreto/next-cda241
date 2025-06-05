@@ -114,7 +114,7 @@ jobs:
       name: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
     name: Deploy ${{ github.ref_name == 'main' && 'Production' || 'Test' }} Docker Image To Remote Server With SSH
     env:
-      WORKDIR: ./${{ github.repository_id }}/${{ vars.WORKDIR }}
+      WORKDIR: ./$(basename "${{ github.repository }}")/${{ vars.WORKDIR }}
       COMPOSE_FILE: docker-compose.${{ github.ref_name == 'main' && 'prod' || 'test' }}.yml
       SSH: "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"
     steps:
