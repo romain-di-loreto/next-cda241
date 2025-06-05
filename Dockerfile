@@ -8,7 +8,14 @@ RUN apt-get update -yq \
 LABEL org.opencontainers.image.source=https://github.com/romain-di-loreto/next-cda241
 COPY . /app/
 WORKDIR /app
-RUN npm install \
-    && npm run build
+
+RUN npm install 
+RUN npm run build
+
 EXPOSE 3000
-CMD npm run start
+
+COPY docker/next/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/entrypoint
+
+ENTRYPOINT ["entrypoint"]
+CMD ["npm", "run", "start"]

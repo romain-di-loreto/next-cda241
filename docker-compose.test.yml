@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  next-app:
+    image: ghcr.io/romain-di-loreto/next-cda241/next-app-test:latest
+    container_name: next-app-test
+    ports:
+      - "8080:3000"
+    environment:
+      - NODE_ENV=production
+    restart: always
